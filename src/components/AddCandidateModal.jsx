@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const MODALIDADES_SUGERIDAS = [
+const MODALIDADES_RAPIDAS = [
   'Futebol',
   'Basquete',
   'Ginástica Artística',
@@ -9,8 +9,6 @@ const MODALIDADES_SUGERIDAS = [
   'Tênis',
   'Natação',
   'Vôlei',
-  'Atletismo',
-  'Surfe',
 ];
 
 export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
@@ -25,15 +23,12 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  // Fecha modal ao pressionar ESC
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -47,7 +42,7 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
     e.preventDefault();
 
     if (!formData.nome.trim() || !formData.esporte.trim() || !formData.clube.trim() || !formData.pais.trim()) {
-      setFormError('Por favor, preencha todos os campos obrigatórios (*).');
+      setFormError('Preencha os campos obrigatórios marcados com (*).');
       return;
     }
 
@@ -67,77 +62,69 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
   };
 
   return (
-    <div className="modal-backdrop-layer" onClick={(e) => {
+    <div className="brutal-modal-overlay" onClick={(e) => {
       if (e.target === e.currentTarget) onClose();
     }}>
-      <div className="modal-dialog-box">
-        <div className="modal-header-section">
+      <div className="brutal-modal-card">
+        <div className="modal-top-ticket-header">
           <div>
-            <span className="modal-kicker">PREMIAÇÃO OFICIAL</span>
-            <h2 className="modal-main-title">Cadastrar Novo Indicado</h2>
+            <span className="ticket-stamp">CREDENCIAL OFICIAL</span>
+            <h2 className="modal-title-bold">INSCREVER NOVO ATLETA</h2>
           </div>
           <button
             type="button"
-            className="modal-close-icon-btn"
+            className="modal-cross-btn"
             onClick={onClose}
-            title="Fechar janela"
+            title="Fechar formulário"
           >
             ✕
           </button>
         </div>
 
         {formError && (
-          <div className="form-error-banner">
+          <div className="brutal-alert-box">
             <span>⚠️</span>
             <span>{formError}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="modal-form-body">
-          {/* Campo Nome */}
-          <div className="input-group">
-            <label className="input-field-label">
-              Nome Completo do Atleta <span className="req-asterisk">*</span>
-            </label>
+        <form onSubmit={handleSubmit} className="brutal-form-body">
+          <div className="form-input-block">
+            <label className="brutal-label">NOME COMPLETO DO ATLETA *</label>
             <input
               type="text"
-              className="custom-text-input"
-              placeholder="Ex: Vinícius Jr., Simone Biles..."
+              className="brutal-input-field"
+              placeholder="Ex: Rayssa Leal, Vinicius Jr..."
               value={formData.nome}
               onChange={(e) => handleChange('nome', e.target.value)}
               required
             />
           </div>
 
-          {/* Linha Esporte + Clube */}
-          <div className="input-row-twin">
-            <div className="input-group">
-              <label className="input-field-label">
-                Modalidade / Esporte <span className="req-asterisk">*</span>
-              </label>
+          <div className="form-twin-row">
+            <div className="form-input-block">
+              <label className="brutal-label">MODALIDADE ESPORTIVA *</label>
               <input
                 type="text"
-                list="sports-suggestions"
-                className="custom-text-input"
-                placeholder="Ex: Futebol, Basquete..."
+                list="sports-list-suggest"
+                className="brutal-input-field"
+                placeholder="Ex: Futebol, Skate..."
                 value={formData.esporte}
                 onChange={(e) => handleChange('esporte', e.target.value)}
                 required
               />
-              <datalist id="sports-suggestions">
-                {MODALIDADES_SUGERIDAS.map((item) => (
-                  <option key={item} value={item} />
+              <datalist id="sports-list-suggest">
+                {MODALIDADES_RAPIDAS.map((m) => (
+                  <option key={m} value={m} />
                 ))}
               </datalist>
             </div>
 
-            <div className="input-group">
-              <label className="input-field-label">
-                Clube / Delegação <span className="req-asterisk">*</span>
-              </label>
+            <div className="form-input-block">
+              <label className="brutal-label">CLUBE OU EQUIPE *</label>
               <input
                 type="text"
-                className="custom-text-input"
+                className="brutal-input-field"
                 placeholder="Ex: Real Madrid, Flamengo..."
                 value={formData.clube}
                 onChange={(e) => handleChange('clube', e.target.value)}
@@ -146,44 +133,38 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
             </div>
           </div>
 
-          {/* Campo País */}
-          <div className="input-group">
-            <label className="input-field-label">
-              País de Representação <span className="req-asterisk">*</span>
-            </label>
+          <div className="form-input-block">
+            <label className="brutal-label">PAÍS DE REPRESENTAÇÃO *</label>
             <input
               type="text"
-              className="custom-text-input"
-              placeholder="Ex: Brasil, Argentina, Estados Unidos..."
+              className="brutal-input-field"
+              placeholder="Ex: Brasil, Estados Unidos..."
               value={formData.pais}
               onChange={(e) => handleChange('pais', e.target.value)}
               required
             />
           </div>
 
-          {/* Campo URL da Foto com Preview */}
-          <div className="input-group">
-            <label className="input-field-label">
-              URL da Foto Oficial (opcional)
-            </label>
+          <div className="form-input-block">
+            <label className="brutal-label">LINK DA FOTO DO ATLETA (OPCIONAL)</label>
             <input
               type="url"
-              className="custom-text-input"
-              placeholder="https://exemplo.com/foto-do-atleta.jpg"
+              className="brutal-input-field"
+              placeholder="https://..."
               value={formData.foto}
               onChange={(e) => handleChange('foto', e.target.value)}
             />
           </div>
 
-          {/* Preview da Imagem se informada */}
+          {/* Live Preview */}
           {formData.foto && (
-            <div className="live-photo-preview-box">
-              <span className="preview-label">Pré-visualização da imagem:</span>
-              <div className="preview-avatar-circle">
+            <div className="brutal-preview-box">
+              <span className="preview-stamp">PRÉVIA DO CARD:</span>
+              <div className="preview-circle-frame">
                 <img
                   src={formData.foto}
-                  alt="Prévia do atleta"
-                  className="preview-img"
+                  alt="Prévia"
+                  className="preview-img-tag"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     if (e.currentTarget.nextElementSibling) {
@@ -191,29 +172,29 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
                     }
                   }}
                 />
-                <span className="preview-error-hint" style={{ display: 'none' }}>
-                  Não foi possível carregar a imagem deste link.
+                <span className="preview-fail-txt" style={{ display: 'none' }}>
+                  Link inválido ou imagem indisponível
                 </span>
               </div>
             </div>
           )}
 
-          {/* Ações do Rodapé */}
-          <div className="modal-actions-bar">
+          <div className="modal-actions-footer">
             <button
               type="button"
-              className="modal-cancel-btn"
+              className="brutal-btn btn-secondary"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancelar
             </button>
+
             <button
               type="submit"
-              className="modal-submit-btn"
+              className="brutal-btn btn-action"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Salvando...' : 'Cadastrar Indicado'}
+              {isSubmitting ? 'Salvando...' : '✓ Confirmar Inscrição'}
             </button>
           </div>
         </form>
@@ -221,4 +202,3 @@ export function AddCandidateModal({ isOpen, onClose, onSubmit }) {
     </div>
   );
 }
-

@@ -13,15 +13,14 @@ export function CandidateGrid({
 }) {
   if (loading) {
     return (
-      <div className="athletes-grid">
+      <div className="cards-masonry-grid">
         {[1, 2, 3, 4, 5, 6].map((key) => (
-          <div key={key} className="skeleton-card">
-            <div className="skeleton-top" />
-            <div className="skeleton-avatar" />
-            <div className="skeleton-title" />
-            <div className="skeleton-sub" />
-            <div className="skeleton-bar" />
-            <div className="skeleton-btn" />
+          <div key={key} className="skeleton-brutal-card">
+            <div className="skel-header" />
+            <div className="skel-img" />
+            <div className="skel-txt" />
+            <div className="skel-bar" />
+            <div className="skel-btn" />
           </div>
         ))}
       </div>
@@ -30,35 +29,29 @@ export function CandidateGrid({
 
   if (candidates.length === 0) {
     return (
-      <div className="empty-results-box">
-        <div className="empty-results-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="empty-icon-svg">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            <line x1="8" y1="11" x2="14" y2="11" />
-          </svg>
-        </div>
-        <h3 className="empty-results-title">
-          {searchQuery ? 'Nenhum atleta encontrado para sua busca' : 'Nenhum indicado cadastrado'}
+      <div className="empty-deck-notice">
+        <div className="empty-deck-icon">🃏</div>
+        <h3 className="empty-deck-heading">
+          {searchQuery ? `Nenhum atleta encontrado para "${searchQuery}"` : 'Coleção de atletas vazia'}
         </h3>
-        <p className="empty-results-desc">
+        <p className="empty-deck-text">
           {searchQuery
-            ? `Não encontramos resultados para "${searchQuery}". Tente usar outros termos ou selecione outra modalidade.`
-            : 'A lista de concorrentes ao troféu está vazia. Adicione o primeiro atleta para abrir a apuração!'}
+            ? 'Tente ajustar os termos da pesquisa ou selecione outra modalidade no filtro acima.'
+            : 'Adicione os competidores ao troféu para abrir a rodada de votos da temporada!'}
         </p>
         <button
           type="button"
-          className="empty-action-btn"
+          className="empty-deck-cta-btn"
           onClick={onOpenAddModal}
         >
-          + Cadastrar Atleta
+          ➕ Adicionar Primeiro Atleta
         </button>
       </div>
     );
   }
 
   return (
-    <div className="athletes-grid">
+    <div className="cards-masonry-grid">
       {candidates.map((item, index) => (
         <CandidateCard
           key={item.id}
@@ -73,4 +66,3 @@ export function CandidateGrid({
     </div>
   );
 }
-

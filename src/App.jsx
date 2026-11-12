@@ -2,7 +2,6 @@ import React from 'react';
 import { useVotingSystem } from './hooks/useVotingSystem';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
-import { Podium } from './components/Podium';
 import { FilterControls } from './components/FilterControls';
 import { CandidateGrid } from './components/CandidateGrid';
 import { AddCandidateModal } from './components/AddCandidateModal';
@@ -13,7 +12,6 @@ export default function App() {
   const {
     candidates,
     filteredCandidates,
-    podiumList,
     leaderCandidate,
     stats,
     loading,
@@ -37,11 +35,11 @@ export default function App() {
   } = useVotingSystem();
 
   return (
-    <div className="awards-app-root">
-      {/* Sistema de Notificações Toast */}
+    <div className="brutal-app-root">
+      {/* Sistema de Toasts */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
-      {/* Barra de Navegação Superior */}
+      {/* Navegação com Ticker */}
       <Navbar
         onOpenModal={() => setIsModalOpen(true)}
         onResetVotes={handleReset}
@@ -49,9 +47,9 @@ export default function App() {
         onRefresh={() => reloadData(false)}
       />
 
-      {/* Conteúdo Principal */}
-      <main className="main-content-wrapper">
-        {/* Banner Hero com Spotlight do Líder */}
+      {/* Conteúdo Central */}
+      <main className="brutal-main-container">
+        {/* Hero Pôster com Card Dourado do Líder */}
         <HeroBanner
           leader={leaderCandidate}
           stats={stats}
@@ -59,31 +57,23 @@ export default function App() {
           votingId={votingId}
         />
 
-        {/* Pódio dos 3 Primeiros Colocados */}
-        <Podium
-          podiumList={podiumList}
-          totalVotes={stats.totalVotos}
-          onVote={handleVote}
-          votingId={votingId}
-        />
-
-        {/* Seção Principal de Votação */}
-        <section className="voting-section" id="candidatos-secao">
-          <div className="section-header-row">
+        {/* Seção Principal de Cartas & Votação */}
+        <section className="brutal-deck-section" id="candidatos-secao">
+          <div className="deck-section-title-bar">
             <div>
-              <span className="section-eyebrow">APURAÇÃO AO VIVO</span>
-              <h2 className="section-main-heading">Candidatos ao Troféu</h2>
+              <span className="deck-sub-tag">COLEÇÃO OFICIAL 2026</span>
+              <h2 className="deck-main-headline">Quadro de Atletas</h2>
             </div>
             <button
               type="button"
-              className="quick-add-link-btn"
+              className="deck-fast-add-btn"
               onClick={() => setIsModalOpen(true)}
             >
-              + Adicionar Novo
+              ➕ Adicionar Atleta
             </button>
           </div>
 
-          {/* Filtros e Busca */}
+          {/* Filtros e Pesquisa */}
           <FilterControls
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -96,7 +86,7 @@ export default function App() {
             totalCandidates={candidates.length}
           />
 
-          {/* Grade de Atletas */}
+          {/* Grade de Cards Colecionáveis */}
           <CandidateGrid
             candidates={filteredCandidates}
             loading={loading}
@@ -110,10 +100,10 @@ export default function App() {
         </section>
       </main>
 
-      {/* Rodapé da Aplicação */}
+      {/* Rodapé */}
       <Footer />
 
-      {/* Modal de Cadastro de Atleta */}
+      {/* Modal de Cadastro */}
       <AddCandidateModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

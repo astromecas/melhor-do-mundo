@@ -12,70 +12,65 @@ export function FilterControls({
   totalCandidates,
 }) {
   return (
-    <div className="filter-controls-container">
-      <div className="filter-top-row">
-        {/* Barra de Busca */}
-        <div className="search-bar-wrapper">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+    <div className="brutal-filter-deck">
+      <div className="filter-search-sort-row">
+        {/* Campo de Busca Estilizado */}
+        <div className="brutal-search-container">
+          <span className="search-symbol">🔍</span>
           <input
             type="text"
-            className="search-input"
-            placeholder="Pesquisar atleta, modalidade, clube ou país..."
+            className="brutal-search-input"
+            placeholder="Pesquisar por atleta, clube, esporte ou país..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
           {searchQuery && (
             <button
               type="button"
-              className="search-clear-btn"
+              className="search-clear-cross"
               onClick={() => onSearchChange('')}
-              title="Limpar pesquisa"
+              title="Limpar busca"
             >
               ✕
             </button>
           )}
         </div>
 
-        {/* Ordenação */}
-        <div className="sort-wrapper">
-          <label htmlFor="sort-select" className="sort-label">Ordenar:</label>
+        {/* Seletor de Ordenação */}
+        <div className="brutal-sort-container">
+          <label htmlFor="sort-select" className="sort-tag-label">ORDENAR POR:</label>
           <select
             id="sort-select"
-            className="sort-dropdown"
+            className="brutal-select-dropdown"
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
           >
-            <option value="votos-desc">🔥 Mais votados</option>
-            <option value="votos-asc">📉 Menos votados</option>
-            <option value="nome-asc">🔤 Nome (A-Z)</option>
+            <option value="votos-desc">🔥 Mais Votados</option>
+            <option value="votos-asc">📉 Menos Votados</option>
+            <option value="nome-asc">🔤 Nome (A a Z)</option>
           </select>
         </div>
       </div>
 
-      {/* Categorias por Modalidade */}
-      <div className="categories-pill-row">
-        <span className="categories-title">Modalidades:</span>
-        <div className="categories-scroll">
+      {/* Abas de Categorias / Modalidades */}
+      <div className="brutal-categories-row">
+        <span className="categories-badge-label">FILTRAR ESPORTE:</span>
+        <div className="categories-pill-scroll">
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
-              className={`category-pill ${activeCategory.toLowerCase() === cat.toLowerCase() ? 'is-active' : ''}`}
+              className={`brutal-category-tab ${activeCategory.toLowerCase() === cat.toLowerCase() ? 'tab-is-active' : ''}`}
               onClick={() => onCategorySelect(cat)}
             >
               {cat}
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="results-counter-bar">
-        <span>Exibindo <strong>{totalResults}</strong> de <strong>{totalCandidates}</strong> atletas indicados</span>
+        <div className="deck-counter-badge">
+          {totalResults} de {totalCandidates} atletas
+        </div>
       </div>
     </div>
   );
 }
-

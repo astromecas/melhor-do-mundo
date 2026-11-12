@@ -15,51 +15,37 @@ export function CandidateCard({
   const isLeader = index === 0 && candidate.votos > 0;
   const rankNumber = index + 1;
 
-  const getRankBadgeClass = () => {
-    if (index === 0 && candidate.votos > 0) return 'rank-top-1';
-    if (index === 1 && candidate.votos > 0) return 'rank-top-2';
-    if (index === 2 && candidate.votos > 0) return 'rank-top-3';
-    return 'rank-standard';
-  };
-
   return (
-    <article className={`athlete-card ${isLeader ? 'athlete-card-leader' : ''} ${isVoting ? 'card-voting-pulse' : ''}`}>
-      {/* Cabeçalho do Card com Posição, País e Botão de Deletar */}
-      <div className="card-top-bar">
-        <div className={`rank-indicator ${getRankBadgeClass()}`}>
-          {isLeader && <span className="rank-crown">👑</span>}
+    <article className={`trading-card-item ${isLeader ? 'is-golden-leader' : ''} ${isVoting ? 'card-bounce-vote' : ''}`}>
+      {/* Faixa Superior do Card */}
+      <div className="card-ribbon-bar">
+        <div className={`card-rank-badge ${rankNumber <= 3 ? `rank-top-${rankNumber}` : 'rank-standard'}`}>
+          {isLeader && <span className="crown-mini">👑</span>}
           <span>#{rankNumber}</span>
         </div>
 
-        <div className="card-top-right">
-          <span className="country-badge" title={`País: ${candidate.pais}`}>
-            <span className="country-icon">📍</span>
-            <span>{candidate.pais}</span>
+        <div className="card-badges-right">
+          <span className="card-country-stamp">
+            📍 {candidate.pais}
           </span>
-
           <button
             type="button"
-            className="delete-athlete-btn"
+            className="card-delete-cross"
             onClick={() => onDelete(candidate.id, candidate.nome)}
-            title="Remover este candidato"
+            title="Remover indicado"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="trash-icon">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <line x1="10" y1="11" x2="10" y2="17" />
-              <line x1="14" y1="11" x2="14" y2="17" />
-            </svg>
+            ✕
           </button>
         </div>
       </div>
 
-      {/* Frame de Imagem do Atleta */}
-      <div className="athlete-photo-container">
+      {/* Moldura de Foto */}
+      <div className="card-photo-box">
         {candidate.foto ? (
           <img
             src={candidate.foto}
             alt={candidate.nome}
-            className="athlete-photo-img"
+            className="card-photo-content"
             loading="lazy"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
@@ -70,56 +56,54 @@ export function CandidateCard({
           />
         ) : null}
         <div
-          className="athlete-fallback-avatar"
+          className="card-photo-fallback"
           style={{ display: candidate.foto ? 'none' : 'flex' }}
         >
           {candidate.nome.substring(0, 2).toUpperCase()}
         </div>
 
-        <span className="sport-tag-pill">{candidate.esporte}</span>
+        <div className="card-sport-sticker">
+          {candidate.esporte}
+        </div>
       </div>
 
-      {/* Dados do Atleta */}
-      <div className="athlete-identity">
-        <h3 className="athlete-name" title={candidate.nome}>{candidate.nome}</h3>
-        <p className="athlete-club">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="club-shield-icon">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
+      {/* Informações do Atleta */}
+      <div className="card-body-content">
+        <h3 className="card-athlete-title" title={candidate.nome}>
+          {candidate.nome}
+        </h3>
+
+        <div className="card-club-tag">
+          <span className="club-icon">🛡️</span>
           <span>{candidate.clube}</span>
-        </p>
-      </div>
+        </div>
 
-      {/* Estatísticas de Votos e Barra de Progresso */}
-      <div className="vote-metrics-panel">
-        <div className="vote-count-row">
-          <div className="vote-score-display">
-            <span className="vote-highlight-num">{candidate.votos.toLocaleString('pt-BR')}</span>
-            <span className="vote-word-label">{candidate.votos === 1 ? 'voto' : 'votos'}</span>
+        {/* Placar de Votos com Barra Estilizada */}
+        <div className="card-tally-box">
+          <div className="tally-line">
+            <span className="tally-count-bold">
+              {candidate.votos.toLocaleString('pt-BR')} <small>{candidate.votos === 1 ? 'voto' : 'votos'}</small>
+            </span>
+            <span className="tally-pct-badge">{percentage}%</span>
           </div>
-          <span className="vote-ratio-pill">{percentage}%</span>
+
+          <div className="tally-bar-frame">
+            <div
+              className={`tally-bar-fill ${isLeader ? 'fill-yellow-stripes' : 'fill-cyan-stripes'}`}
+              style={{ width: `${Math.max(Number(percentage), 4)}%` }}
+            />
+          </div>
         </div>
 
-        <div className="progress-track">
-          <div
-            className={`progress-fill-bar ${isLeader ? 'fill-gold' : 'fill-cyan'}`}
-            style={{ width: `${Math.max(Number(percentage), 3)}%` }}
-          />
-        </div>
+        {/* Botão de Votação Neo-Brutalist */}
+        <button
+          type="button"
+          className={`card-vote-trigger-btn ${isVoting ? 'btn-voting-active' : ''}`}
+          onClick={() => onVote(candidate.id)}
+        >
+          {isVoting ? '⚡ COMPUTANDO...' : '🗳️ VOTAR NESTE ATLETA'}
+        </button>
       </div>
-
-      {/* Botão de Votação */}
-      <button
-        type="button"
-        className={`cast-vote-btn ${isVoting ? 'btn-active-voted' : ''}`}
-        onClick={() => onVote(candidate.id)}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="vote-icon">
-          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-        </svg>
-        <span>{isVoting ? 'Computando...' : 'Votar no Atleta'}</span>
-      </button>
     </article>
   );
 }
-
