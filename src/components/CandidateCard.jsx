@@ -101,7 +101,7 @@ export function CandidateCard({
           className={`card-vote-trigger-btn ${isVoting ? 'btn-voting-active' : ''}`}
           onClick={() => onVote(candidate.id)}
         >
-          {isVoting ? '⚡ COMPUTANDO...' : '🗳️ VOTAR NESTE ATLETA'}
+          {isVoting ? 'COMPUTANDO VOTO...' : '🗳️ VOTAR NESTE ATLETA'}
         </button>
       </div>
     </article>

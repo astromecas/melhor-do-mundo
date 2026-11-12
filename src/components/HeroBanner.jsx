@@ -93,7 +93,7 @@ export function HeroBanner({ leader, stats, onVote, votingId }) {
                   className={`mvp-vote-action-btn ${votingId === leader.id ? 'btn-pressed' : ''}`}
                   onClick={() => onVote(leader.id)}
                 >
-                  ⚡ Votar no Líder (+1)
+                  🗳️ Votar no Líder (+1)
                 </button>
               </div>
             </div>

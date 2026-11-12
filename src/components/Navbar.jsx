@@ -6,7 +6,7 @@ export function Navbar({ onOpenModal, onResetVotes, totalVotes, onRefresh }) {
       {/* Ticker de Faixa Amarela no Topo */}
       <div className="brutal-ticker-strip">
         <div className="ticker-inner">
-          <span>⚡ APURAÇÃO AO VIVO // VOTAÇÃO POPULAR 2026</span>
+          <span>🏆 APURAÇÃO AO VIVO // VOTAÇÃO POPULAR 2026</span>
           <span className="ticker-dot">●</span>
           <span>QUEM É O MAIOR ATLETA DO MUNDO?</span>
           <span className="ticker-dot">●</span>

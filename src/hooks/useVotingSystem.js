@@ -172,7 +172,7 @@ export function useVotingSystem() {
     try {
       await castCandidateVote(id);
       await reloadData();
-      showToast('⚡ Voto computado com sucesso!', 'success');
+      showToast('✓ Voto registrado com sucesso!', 'success');
     } catch (err) {
       // Fallback local: incrementa direto no estado
       setCandidates((prev) => {
@@ -182,7 +182,7 @@ export function useVotingSystem() {
         setStats(computeStats(updated));
         return updated;
       });
-      showToast('⚡ Voto computado com sucesso!', 'success');
+      showToast('✓ Voto registrado com sucesso!', 'success');
     } finally {
       setTimeout(() => setVotingId(null), 500);
     }
