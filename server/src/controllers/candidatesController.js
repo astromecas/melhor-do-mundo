@@ -1,108 +1,135 @@
 const prisma = require('../database/client');
 
 /**
- * Controller responsável pelas operações com candidatos da premiação
+ * Controller responsável pelo gerenciamento de atletas concorrentes ao prêmio
  */
 
-// Recupera a lista completa de candidatos ordenados por número de votos
+// Lista todos os candidatos, suportando filtros opcionais por query parameters
 async function listAllCandidates(req, res) {
   try {
-    const list = await prisma.candidato.findMany({
-      orderBy: {
-        votos: 'desc',
-      },
+    const { busca, esporte, ordem } = req.query;
+
+    // Construção dinâmica de filtros de consulta
+    const whereConditions = {};
+
+    if (esporte && esporte.trim().toLowerCase() !== 'todos') {
+      whereConditions.esporte = {
+        equals: esporte.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    if (busca && busca.trim()) {
+      const termo = busca.trim();
+      whereConditions.OR = [
+        { nome: { contains: termo, mode: 'insensitive' } },
+        { clube: { contains: termo, mode: 'insensitive' } },
+        { pais: { contains: termo, mode: 'insensitive' } },
+        { esporte: { contains: termo, mode: 'insensitive' } },
+      ];
+    }
+
+    // Configuração de ordenação
+    let orderByConfig = { votos: 'desc' };
+    if (ordem === 'votos-asc') {
+      orderByConfig = { votos: 'asc' };
+    } else if (ordem === 'nome-asc') {
+      orderByConfig = { nome: 'asc' };
+    }
+
+    const candidatos = await prisma.candidato.findMany({
+      where: whereConditions,
+      orderBy: orderByConfig,
     });
-    return res.status(200).json(list);
+
+    return res.status(200).json(candidatos);
   } catch (err) {
-    console.error('Erro na consulta de candidatos:', err);
-    return res.status(500).json({ error: 'Não foi possível carregar a lista de indicados.' });
+    console.error('Falha ao listar candidatos:', err);
+    return res.status(500).json({ error: 'Erro ao carregar a lista de atletas.' });
   }
 }
 
-// Busca detalhes de um único candidato pelo identificador numérico
+// Retorna detalhes de um candidato específico pelo ID
 async function getCandidateById(req, res) {
-  const candidateId = Number(req.params.id);
+  const candidateId = parseInt(req.params.id, 10);
 
   if (isNaN(candidateId)) {
-    return res.status(400).json({ error: 'Identificador do candidato inválido.' });
+    return res.status(400).json({ error: 'O identificador deve ser um número inteiro válido.' });
   }
 
   try {
-    const record = await prisma.candidato.findUnique({
+    const candidato = await prisma.candidato.findUnique({
       where: { id: candidateId },
     });
 
-    if (!record) {
-      return res.status(404).json({ error: 'Indicado não encontrado no sistema.' });
+    if (!candidato) {
+      return res.status(404).json({ error: 'Candidato não localizado na base de dados.' });
     }
 
-    return res.status(200).json(record);
+    return res.status(200).json(candidato);
   } catch (err) {
-    console.error(`Erro ao consultar candidato ${candidateId}:`, err);
-    return res.status(500).json({ error: 'Falha ao buscar os detalhes do candidato.' });
+    console.error(`Erro ao consultar atleta ID ${candidateId}:`, err);
+    return res.status(500).json({ error: 'Erro ao consultar candidato.' });
   }
 }
 
-// Cadastra um novo candidato para a premiação
+// Cria um novo atleta após validação do payload
 async function createCandidate(req, res) {
-  const { nome, esporte, clube, pais, foto } = req.body;
-
-  if (!nome || !esporte || !clube || !pais) {
-    return res.status(400).json({
-      error: 'Parâmetros obrigatórios ausentes. Informe: nome, esporte, clube e país.',
-    });
-  }
+  const dados = req.sanitizedCandidate || req.body;
 
   try {
-    const novoCandidato = await prisma.candidato.create({
+    const novoAtleta = await prisma.candidato.create({
       data: {
-        nome: String(nome).trim(),
-        esporte: String(esporte).trim(),
-        clube: String(clube).trim(),
-        pais: String(pais).trim(),
-        foto: foto && String(foto).trim().length > 0 ? String(foto).trim() : null,
+        nome: dados.nome,
+        esporte: dados.esporte,
+        clube: dados.clube,
+        pais: dados.pais,
+        foto: dados.foto || null,
         votos: 0,
       },
     });
 
-    return res.status(201).json(novoCandidato);
+    return res.status(201).json(novoAtleta);
   } catch (err) {
-    console.error('Erro ao cadastrar indicado:', err);
-    return res.status(500).json({ error: 'Falha interna ao criar novo candidato.' });
+    console.error('Falha na inserção do atleta:', err);
+    return res.status(500).json({ error: 'Não foi possível cadastrar o candidato.' });
   }
 }
 
-// Incrementa a contagem de votos do candidato especificado
+// Incrementa a contagem de votos do atleta selecionado
 async function registerVote(req, res) {
-  const candidateId = Number(req.params.id);
+  const candidateId = parseInt(req.params.id, 10);
 
   if (isNaN(candidateId)) {
-    return res.status(400).json({ error: 'ID do candidato precisa ser um número válido.' });
+    return res.status(400).json({ error: 'ID inválido para registro de voto.' });
   }
 
   try {
     const atualizado = await prisma.candidato.update({
       where: { id: candidateId },
       data: {
-        votos: {
-          increment: 1,
-        },
+        votos: { increment: 1 },
       },
     });
 
     return res.status(200).json(atualizado);
   } catch (err) {
-    console.error(`Erro ao registrar voto para o ID ${candidateId}:`, err);
-    return res.status(500).json({ error: 'Falha ao computar voto do atleta.' });
+    // Código P2025 do Prisma: registro não encontrado
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'Atleta não encontrado para receber voto.' });
+    }
+
+    console.error(`Falha ao registrar voto para ID ${candidateId}:`, err);
+    return res.status(500).json({ error: 'Erro ao computar voto.' });
   }
 }
 
-// Remove um candidato do banco de dados
+// Exclui um atleta do sistema
 async function deleteCandidate(req, res) {
-  const candidateId = Number(req.params.id);
+  const candidateId = parseInt(req.params.id, 10);
 
   if (isNaN(candidateId)) {
-    return res.status(400).json({ error: 'ID inválido para remoção.' });
+    return res.status(400).json({ error: 'ID inválido para exclusão.' });
   }
 
   try {
@@ -111,16 +138,20 @@ async function deleteCandidate(req, res) {
     });
 
     return res.status(200).json({
-      message: 'Candidato desclassificado e removido com sucesso.',
+      message: 'Candidato excluído com sucesso.',
       id: candidateId,
     });
   } catch (err) {
-    console.error(`Erro ao deletar candidato ${candidateId}:`, err);
-    return res.status(500).json({ error: 'Falha ao remover candidato do sistema.' });
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'Atleta não encontrado para remoção.' });
+    }
+
+    console.error(`Erro ao remover atleta ${candidateId}:`, err);
+    return res.status(500).json({ error: 'Erro ao deletar candidato.' });
   }
 }
 
-// Zera o placar de votos de todos os candidatos
+// Reinicia o placar zerando todos os votos da premiação
 async function resetVotes(req, res) {
   try {
     const resultado = await prisma.candidato.updateMany({
@@ -128,12 +159,12 @@ async function resetVotes(req, res) {
     });
 
     return res.status(200).json({
-      message: 'A apuração foi reiniciada. Todos os votos estão zerados.',
+      message: 'Todos os votos foram zerados com sucesso.',
       afetados: resultado.count,
     });
   } catch (err) {
-    console.error('Erro ao zerar contagem de votos:', err);
-    return res.status(500).json({ error: 'Erro ao zerar os votos da premiação.' });
+    console.error('Falha ao zerar votos da premiação:', err);
+    return res.status(500).json({ error: 'Erro ao reiniciar contagem de votos.' });
   }
 }
 
@@ -145,4 +176,3 @@ module.exports = {
   deleteCandidate,
   resetVotes,
 };
-
