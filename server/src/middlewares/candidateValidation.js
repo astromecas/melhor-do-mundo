@@ -57,3 +57,4 @@ function validateCandidatePayload(req, res, next) {
 module.exports = {
   validateCandidatePayload,
 };
+
